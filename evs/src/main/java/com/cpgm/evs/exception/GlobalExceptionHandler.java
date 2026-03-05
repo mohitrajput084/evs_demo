@@ -10,18 +10,18 @@ import java.time.LocalDateTime;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiErrorResponse> handleException(Exception ex) {
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ApiErrorResponse> handleIllegalState(IllegalStateException ex) {
 
         ApiErrorResponse error = ApiErrorResponse.builder()
-                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                .status(HttpStatus.CONFLICT.value())
                 .message(ex.getMessage())
                 .timestamp(LocalDateTime.now())
                 .build();
 
-        return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(error, HttpStatus.CONFLICT);
     }
-    
+
     @ExceptionHandler(org.springframework.security.authentication.BadCredentialsException.class)
     public ResponseEntity<ApiErrorResponse> handleBadCredentials(Exception ex) {
 
@@ -33,7 +33,7 @@ public class GlobalExceptionHandler {
 
         return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
     }
-    
+
     @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
     public ResponseEntity<ApiErrorResponse> handleAccessDenied(Exception ex) {
 
@@ -46,4 +46,15 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
     }
 
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ApiErrorResponse> handleException(Exception ex) {
+
+        ApiErrorResponse error = ApiErrorResponse.builder()
+                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                .message(ex.getMessage())
+                .timestamp(LocalDateTime.now())
+                .build();
+
+        return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 }

@@ -31,23 +31,19 @@ public class VoteService {
         Election election = electionRepository.findById(request.getElectionId())
                 .orElseThrow(() -> new RuntimeException("Election not found"));
 
-        if (!election.isActive()) {
-            throw new RuntimeException("Election is not active");
+        Candidate candidate = candidateRepository.findById(request.getCandidateId())
+                .orElseThrow(() -> new RuntimeException("Candidate not found"));
+
+        // Candidate must belong to election
+        if (!candidate.getElection().getId().equals(election.getId())) {
+            throw new IllegalStateException("Candidate does not belong to this election");
         }
 
         boolean alreadyVoted = voteRepository
                 .existsByVoterIdAndElectionId(voter.getId(), election.getId());
 
         if (alreadyVoted) {
-            throw new RuntimeException("You have already voted in this election");
-        }
-
-        Candidate candidate = candidateRepository.findById(request.getCandidateId())
-                .orElseThrow(() -> new RuntimeException("Candidate not found"));
-
-        // Candidate must belong to election
-        if (!candidate.getElection().getId().equals(election.getId())) {
-            throw new RuntimeException("Candidate does not belong to this election");
+            throw new IllegalStateException("You have already voted in this election");
         }
 
         Vote vote = Vote.builder()
